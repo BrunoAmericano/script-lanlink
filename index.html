@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scripts de Atualização - IPSEMG</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+
+
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: #333;
+    /* Fundo degradê Lanlink azul -> branco */
+    background: linear-gradient(360deg, #0056A3 0%, #ffffff 100%);
+    min-height: 100vh; /* garante que ocupe toda a altura da tela */
+    margin: 0;
+    padding: 0;
+  }
+
+  input, textarea, select {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  border-radius: 8px;
+  box-shadow: inset 1px 1px 5px rgba(0,0,0,0.05);
+}
+
+  h1 {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  }
+
+  /* Menu de seleção */
+  .form-select {
+    max-width: 600px;
+    margin-bottom: 30px;
+  }
+
+  /* Cards */
+  .container-script {
+      display: none;
+    background: rgba(255, 255, 255, 0.9); /* branco semi-transparente */
+    backdrop-filter: blur(5px); /* leve desfoque do fundo atrás do card */
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .container-script:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  }
+
+  .container-script.visible {
+    display: block;
+  }
+
+  h2 {
+    color: #0d6efd;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
+
+  textarea.form-control {
+    background: #f7f9fc;
+    border: 1px solid #ced4da;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  input.form-control:focus, textarea.form-control:focus {
+    border: 2px solid #004aad;
+    box-shadow: 0 0 8px rgba(0,74,173,0.5);
+    outline: none;
+  }
+
+  button.btn {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    transition: 0.3s;
+    background: linear-gradient(135deg, #004aad, #00aaff); /* Azul Lanlink degradê */
+    border: none;
+    color: white;
+  }
+
+  button.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 12px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, #003380, #0088cc);
+  }
+
+  button.btn i {
+    margin-right: 10px;
+  }
+
+
+  #msgCopiado {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #28a745;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  
+  #msgCopiado.show {
+    display: block;
+    opacity: 1;
+  }
+
+  /* Botões pequenos de Hoje/Agora */
+  .btn-sm-custom {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="container my-4">
+
+<h1 class="mb-4 text-primary text-center"
+    style="
+         font-family: 'Montserrat', sans-serif;
+         font-weight:700;
+         letter-spacing: 1px;
+         text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+         ">
+  <img src="https://partner.microsoft.com/-/media/mssc/mpn/partner/licensing/logo-lanlink.png?la=pt-br&hash=6041EB66BE288DF6F056617328B7C958"
+  alt="Lanlink Logo" style="height:100px; display:block; margin: 0 auto 10px auto;">
+  Scripts de Atualização - IPSEMG
+</h1>
+
+  <!-- <h1 class="mb-4 text-primary"><i class="bi bi-file-earmark-text"></i> Scripts de Atualização - IPSEMG</h1> -->
+
+  <!-- Menu de seleção -->
+  <label for="selectSecao" class="form-label fw-bold">Selecione a seção:</label>
+  <select class="form-select" id="selectSecao" onchange="mostrarSecao()">
+    <option value="1">1. Pendente por Ação do Usuário</option>
+    <option value="2">2. Pendente com o Fornecedor</option>
+    <option value="3">3. Agendamento com o Usuário</option>
+    <option value="4">4. Pendente com o Cliente</option>
+    <option value="5">5. Cancelamento do Chamado</option>
+    <option value="6">6. Chamado encerrado por ausência de retorno do solicitante</option>
+    <option value="7">7. Resolução do chamado após ações realizadas</option>
+    <option value="8">8. Tentativa de Contato com o Usuário</option>
+  </select>
+
+  <div id="msgCopiado">Script copiado para a área de transferência! <i class="bi bi-check-circle"></i></div>
+
+  <!-- 1. Pendente por Ação do Usuário -->
+  <div class="container-script" id="secao1">
+    <h2><i class="bi bi-person"></i> 1. Pendente por Ação do Usuário</h2>
+    <label class="form-label">Descreva a solicitação feita ao usuário:</label>
+    <input class="form-control mb-3" type="text" id="solicitacaoUsuario" />
+    <button class="btn btn-primary mb-3" onclick="gerarScriptUsuario()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptUsuario" rows="6" readonly></textarea>
+  </div>
+
+  <!-- 2. Pendente com o Fornecedor -->
+  <div class="container-script" id="secao2">
+    <h2><i class="bi bi-building"></i> 2. Pendente com o Fornecedor</h2>
+    <label class="form-label">Fornecedor:</label>
+    <input class="form-control mb-3" type="text" id="fornecedor" />
+    <div class="d-flex gap-2 mb-3">
+      <input class="form-control" type="date" id="dataFornecedor">
+      <button class="btn btn-success btn-sm-custom" onclick="setToday('dataFornecedor')"><i class="bi bi-calendar-event"></i> Hoje</button>
+    </div>
+    <label class="form-label">Protocolo:</label>
+    <input class="form-control mb-3" type="text" id="protocoloFornecedor" />
+    <button class="btn btn-primary mb-3" onclick="gerarScriptFornecedor()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptFornecedor" rows="6" readonly></textarea>
+  </div>
+
+  <!-- 3. Agendamento com o Usuário -->
+  <div class="container-script" id="secao3">
+    <h2><i class="bi bi-calendar"></i> 3. Agendamento com o Usuário</h2>
+    <div class="d-flex gap-2 mb-3">
+      <input class="form-control" type="date" id="dataAgendamento">
+      <button class="btn btn-success btn-sm-custom" onclick="setToday('dataAgendamento')"><i class="bi bi-calendar-event"></i> Hoje</button>
+    </div>
+    <div class="d-flex gap-2 mb-3">
+      <input class="form-control" type="time" id="horaAgendamento">
+      <button class="btn btn-success btn-sm-custom" onclick="setNow('horaAgendamento')"><i class="bi bi-clock"></i> Agora</button>
+    </div>
+    <button class="btn btn-primary mb-3" onclick="gerarScriptAgendamento()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptAgendamento" rows="6" readonly></textarea>
+  </div>
+
+  <!-- 4. Pendente com o Cliente -->
+  <div class="container-script" id="secao4">
+    <h2><i class="bi bi-people"></i> 4. Pendente com o Cliente</h2>
+    <label class="form-label">Descreva a pendência:</label>
+    <input class="form-control mb-3" type="text" id="pendenciaCliente" />
+    <button class="btn btn-primary mb-3" onclick="gerarScriptCliente()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptCliente" rows="6" readonly></textarea>
+  </div>
+
+  <!-- 5. Cancelamento do Chamado -->
+  <div class="container-script" id="secao5">
+    <h2><i class="bi bi-x-circle"></i> 5. Cancelamento do Chamado</h2>
+    <label class="form-label">Motivo do cancelamento:</label>
+    <input class="form-control mb-3" type="text" id="motivoCancelamento" />
+    <button class="btn btn-primary mb-3" onclick="gerarScriptCancelamento()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptCancelamento" rows="6" readonly></textarea>
+  </div>
+
+  <!-- 6. Chamado encerrado por ausência de retorno do solicitante -->
+  <div class="container-script" id="secao6">
+    <h2><i class="bi bi-exclamation-triangle"></i> 6. Chamado encerrado por ausência de retorno do solicitante</h2>
+    <div class="d-flex gap-2 mb-3">
+      <input class="form-control" type="date" id="dataTentativa1">
+      <button class="btn btn-success btn-sm-custom" onclick="setToday('dataTentativa1')"><i class="bi bi-calendar-event"></i> Hoje</button>
+    </div>
+    <div class="d-flex gap-2 mb-3">
+      <input class="form-control" type="date" id="dataTentativa2">
+      <button class="btn btn-success btn-sm-custom" onclick="setToday('dataTentativa2')"><i class="bi bi-calendar-event"></i> Hoje</button>
+    </div>
+    <button class="btn btn-primary mb-3" onclick="gerarScriptSemRetorno()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptSemRetorno" rows="6" readonly></textarea>
+  </div>
+
+  <!-- 7. Resolução do chamado após ações realizadas -->
+  <div class="container-script" id="secao7">
+    <h2><i class="bi bi-check-circle"></i> 7. Resolução do chamado após ações realizadas</h2>
+    <label class="form-label">Ações realizadas:</label>
+    <textarea class="form-control mb-3" id="acoesRealizadas" rows="3"></textarea>
+    <label class="form-label">Testes realizados:</label>
+    <textarea class="form-control mb-3" id="testesRealizados" rows="2"></textarea>
+    <button class="btn btn-primary mb-3" onclick="gerarScriptConclusao()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptConclusao" rows="6" readonly></textarea>
+  </div>
+
+  <!-- 8. Tentativa de Contato com o Usuário -->
+  <div class="container-script" id="secao8">
+    <h2><i class="bi bi-telephone"></i> 8. Tentativa de Contato com o Usuário</h2>
+    <label class="form-label">Nome do Usuário:</label>
+    <input class="form-control mb-3" type="text" id="nomeUsuarioContato" />
+    <label class="form-label">Seu Nome:</label>
+    <input class="form-control mb-3" type="text" id="seuNomeContato" />
+    <div class="d-flex gap-2 mb-3">
+      <input class="form-control" type="date" id="dataContato">
+      <button class="btn btn-success btn-sm-custom" onclick="setToday('dataContato')"><i class="bi bi-calendar-event"></i> Hoje</button>
+    </div>
+    <div class="d-flex gap-2 mb-3">
+      <input class="form-control" type="time" id="horaContato">
+      <button class="btn btn-success btn-sm-custom" onclick="setNow('horaContato')"><i class="bi bi-clock"></i> Agora</button>
+    </div>
+    <label class="form-label">Ramal:</label>
+    <input class="form-control mb-3" type="text" id="ramalContato" />
+    <label class="form-label">Número do Chamado:</label>
+    <input class="form-control mb-3" type="text" id="numeroChamadoContato" />
+    <button class="btn btn-primary mb-3" onclick="gerarScriptTentativaContato()"><i class="bi bi-clipboard"></i> Gerar Script</button>
+    <textarea class="form-control" id="scriptTentativaContato" rows="6" readonly></textarea>
+  </div>
+
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function mostrarSecao() {
+    const secao = document.getElementById('selectSecao').value;
+    document.querySelectorAll('.container-script').forEach(c => c.classList.remove('visible'));
+    document.getElementById('secao'+secao).classList.add('visible');
+  }
+  mostrarSecao();
+
+  function setToday(id) {
+    document.getElementById(id).value = new Date().toISOString().split('T')[0];
+  }
+  function setNow(id) {
+    const now = new Date();
+    document.getElementById(id).value = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  }
+  function copiarTexto(id) {
+    const t = document.getElementById(id);
+    t.select(); t.setSelectionRange(0,99999);
+    document.execCommand('copy');
+    const msg = document.getElementById('msgCopiado');
+    msg.classList.add('show');
+    setTimeout(()=>{ msg.classList.remove('show'); },2000);
+
+  }
+
+  function formatDateBR(isoDate){
+    const d = new Date(isoDate);
+    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+  }
+
+  // --- Cole aqui todas as funções gerarScript... do seu código original ---
+
+// 1. Pendente por Ação do Usuário
+function gerarScriptUsuario() {
+  const solicitacao = document.getElementById('solicitacaoUsuario').value.trim();
+  if (!solicitacao) {
+    alert('Por favor, descreva a solicitação feita ao usuário.');
+    return;
+  }
+  const script = `O chamado foi analisado e, no momento, depende de uma ação do usuário para continuidade.
+
+Solicitação/Pendência: ${solicitacao}
+
+Permaneceremos com o chamado em aberto por 2 dias aguardando retorno. Após esse prazo, o chamado poderá ser encerrado por inatividade. Caso já tenha as informações, pedimos a gentileza de nos encaminhar para seguirmos com o atendimento. Serão realizadas mais 3 tentativas de contato para essa tratativa.
+
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptUsuario');
+  textarea.value = script;
+  copiarTexto('scriptUsuario');
+}
+
+// 2. Pendente com o Fornecedor
+function gerarScriptFornecedor() {
+  const fornecedor = document.getElementById('fornecedor').value.trim();
+  const data = document.getElementById('dataFornecedor').value;
+  const protocolo = document.getElementById('protocoloFornecedor').value.trim();
+
+  if (!fornecedor) { alert('Por favor, informe o nome do fornecedor.'); return; }
+  if (!data) { alert('Por favor, informe a data do envio.'); return; }
+  if (!protocolo) { alert('Por favor, informe o número do protocolo.'); return; }
+
+  const dataFormatada = formatDateBR(data);
+
+  const script = `O chamado está em tratativa com o fornecedor ${fornecedor} responsável pela solução.
+A demanda foi encaminhada no dia ${dataFormatada} sob o protocolo ${protocolo}. Estamos no aguardo de retorno ou solução por parte do parceiro para dar continuidade ao atendimento.
+Seguiremos monitorando o andamento e atualizaremos o chamado assim que houver evolução.
+
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptFornecedor');
+  textarea.value = script;
+  copiarTexto('scriptFornecedor');
+}
+
+// 3. Agendamento com o Usuário
+function gerarScriptAgendamento() {
+  const data = document.getElementById('dataAgendamento').value;
+  const hora = document.getElementById('horaAgendamento').value;
+
+  if (!data) { alert('Por favor, informe a data do agendamento.'); return; }
+  if (!hora) { alert('Por favor, informe a hora do agendamento.'); return; }
+
+  const dataFormatada = formatDateBR(data);
+
+  const script = `Chamado em status de agendamento.
+
+Foi agendado o atendimento com o usuário para o dia ${dataFormatada} às ${hora}. Neste período, realizaremos o atendimento do chamado do usuário.
+Caso precise reagendar ou antecipar o atendimento, por favor, informe pelo próprio chamado ou pelos canais de suporte abaixo.
+
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptAgendamento');
+  textarea.value = script;
+  copiarTexto('scriptAgendamento');
+}
+
+// 4. Pendente com o Cliente
+function gerarScriptCliente() {
+  let pendencia = document.getElementById('pendenciaCliente').value.trim();
+  if (!pendencia) pendencia = '[Descreva a pendência por parte do IPSEMG]';
+
+  const script = `O chamado segue pendente aguardando ação ou validação por parte do IPSEMG.
+${pendencia}
+Até o momento, não tivemos o retorno necessário para continuidade do atendimento.
+Caso a demanda tenha sido resolvida, pedimos que confirme o encerramento. Caso contrário, permanecemos à disposição para dar andamento assim que recebermos seu retorno.
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptCliente');
+  textarea.value = script;
+  copiarTexto('scriptCliente');
+}
+
+// 5. Cancelamento do Chamado
+function gerarScriptCancelamento() {
+  const motivo = document.getElementById('motivoCancelamento').value.trim();
+  if (!motivo) { alert('Por favor, informe o motivo do cancelamento.'); return; }
+
+  const script = `O chamado em questão foi cancelado.
+Motivo do cancelamento: ${motivo}.
+Reforçamos que estamos à disposição caso a demanda persista ou surjam novas necessidades. Basta reabrir este chamado ou registrar um novo.
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptCancelamento');
+  textarea.value = script;
+  copiarTexto('scriptCancelamento');
+}
+
+// 6. Chamado encerrado por ausência de retorno do solicitante
+function gerarScriptSemRetorno() {
+  const data1 = document.getElementById('dataTentativa1').value;
+  const data2 = document.getElementById('dataTentativa2').value;
+
+  const data1Formatada = data1 ? formatDateBR(data1) : '[dd/mm]';
+  const data2Formatada = data2 ? formatDateBR(data2) : '[dd/mm]';
+
+  const script = `Foram realizadas tentativas de contato nos dias ${data1Formatada} e ${data2Formatada}, porém não obtivemos retorno para continuidade do atendimento.
+Caso a demanda ainda persista, solicitamos que reabra este chamado ou registre uma nova solicitação.
+
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptSemRetorno');
+  textarea.value = script;
+  copiarTexto('scriptSemRetorno');
+}
+
+// 7. Resolução do chamado após ações realizadas
+function gerarScriptConclusao() {
+  const acoes = document.getElementById('acoesRealizadas').value.trim();
+  if (!acoes) { alert('Por favor, descreva as ações realizadas.'); return; }
+  let testes = document.getElementById('testesRealizados').value.trim();
+  if (!testes) testes = 'Nenhum teste adicional realizado.';
+
+  const script = `O chamado está sendo resolvido após realização das seguintes ações:
+${acoes}
+${testes}
+Nenhuma nova inconsistência identificada no momento do encerramento.
+Caso o problema retorne ou surja nova demanda, estamos à disposição através do portal ou central de atendimento.
+Por gentileza, pedimos que responda à pesquisa de satisfação enviada por e-mail. Sua opinião é muito importante para melhorarmos cada vez mais nosso atendimento.
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptConclusao');
+  textarea.value = script;
+  copiarTexto('scriptConclusao');
+}
+
+// 8. Tentativa de Contato com o Usuário
+function gerarScriptTentativaContato() {
+  const nomeUsuario = document.getElementById('nomeUsuarioContato').value.trim();
+  const seuNome = document.getElementById('seuNomeContato').value.trim();
+  const data = document.getElementById('dataContato').value;
+  const hora = document.getElementById('horaContato').value;
+  const ramal = document.getElementById('ramalContato').value.trim();
+  const chamado = document.getElementById('numeroChamadoContato').value.trim();
+
+  if (!nomeUsuario || !seuNome || !data || !hora || !ramal || !chamado) {
+    alert('Por favor, preencha todos os campos obrigatórios.');
+    return;
+  }
+
+  const dataFormatada = formatDateBR(data);
+
+  const script = `Prezado(a) ${nomeUsuario},
+
+Boa tarde!
+
+Aqui é ${seuNome}, da equipe de Suporte Técnico da Lanlink. Tentamos contato com você no dia ${dataFormatada}, às ${hora}, por meio do ramal ${ramal}, referente ao chamado ${chamado}, mas infelizmente não obtivemos retorno.
+
+Gostaríamos de dar continuidade à tratativa e realizar o atendimento o mais breve possível. Por gentileza, nos informe sua disponibilidade para reagendarmos o contato ou, se preferir, entre em contato conosco pelos canais abaixo:
+
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br
+
+Ficamos no aguardo do seu retorno.`;
+
+  const textarea = document.getElementById('scriptTentativaContato');
+  textarea.value = script;
+  copiarTexto('scriptTentativaContato');
+}
+
+  
+</script>
+</body>
+</html>
