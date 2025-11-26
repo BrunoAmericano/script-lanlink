@@ -159,6 +159,8 @@
     <option value="6">6. Chamado encerrado por ausência de retorno do solicitante</option>
     <option value="7">7. Resolução do chamado após ações realizadas</option>
     <option value="8">8. Tentativa de Contato com o Usuário</option>
+    <option value="9">9. Pendente com a Central de Serviços</option>
+
   </select>
 
   <div id="msgCopiado">Script copiado para a área de transferência! <i class="bi bi-check-circle"></i></div>
@@ -269,6 +271,20 @@
     <textarea class="form-control" id="scriptTentativaContato" rows="6" readonly></textarea>
   </div>
 
+  <!-- 9. Pendente com a Central de Serviços -->
+<div class="container-script" id="secao9">
+  <h2><i class="bi bi-headset"></i> 9. Pendente com a Central de Serviços</h2>
+
+  <label class="form-label">Descreva a pendência:</label>
+  <input class="form-control mb-3" type="text" id="pendenciaCentral" />
+
+  <button class="btn btn-primary mb-3" onclick="gerarScriptCentral()">
+    <i class="bi bi-clipboard"></i> Gerar Script
+  </button>
+
+  <textarea class="form-control" id="scriptCentral" rows="6" readonly></textarea>
+</div>
+
 </div>
 
 <!-- Bootstrap JS Bundle -->
@@ -300,11 +316,12 @@
   }
 
   function formatDateBR(isoDate){
-    const d = new Date(isoDate);
-    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+    if (!isoDate) return '';
+    const [ano, mes, dia] = isoDate.split('-');
+    return `${dia}/${mes}/${ano}`;
   }
 
-  // --- Cole aqui todas as funções gerarScript... do seu código original ---
+  // --- funções gerarScript ---
 
 // 1. Pendente por Ação do Usuário
 function gerarScriptUsuario() {
@@ -519,9 +536,22 @@ function gerarScriptTentativaContato() {
 
   const dataFormatada = formatDateBR(data);
 
+  // --- Lógica para a Saudação Dinamica ---
+  const horaAtual = new Date().getHours();
+  let saudacao;
+
+  if (horaAtual >= 6 && horaAtual < 12) {
+    saudacao = 'Bom dia!';
+  } else if (horaAtual >= 12 && horaAtual < 18) {
+    saudacao = 'Boa tarde!';
+  } else {
+    saudacao = 'Boa noite!';
+  }
+  // --------------------------------------
+
   const script = `Prezado(a) ${nomeUsuario},
 
-Boa tarde!
+${saudacao}
 
 Aqui é ${seuNome}, da equipe de Suporte Técnico da Lanlink. Tentamos contato com você no dia ${dataFormatada}, às ${hora}, por meio do ramal ${ramal}, referente ao chamado ${chamado}, mas infelizmente não obtivemos retorno.
 
@@ -545,6 +575,35 @@ Ficamos no aguardo do seu retorno.`;
   copiarTexto('scriptTentativaContato');
 }
 
+// 9. Pendente com a Central de Serviços
+function gerarScriptCentral() {
+  const pendencia = document.getElementById('pendenciaCentral').value.trim();
+
+  if (!pendencia) {
+    alert('Por favor, informe a pendência com a Central de Serviços.');
+    return;
+  }
+
+  const script = `O chamado segue pendente com a Central de Serviços para continuidade da tratativa.
+Pendência registrada: ${pendencia}
+
+Estamos acompanhando o andamento e atualizaremos o chamado assim que houver retorno da equipe responsável.
+
+Você pode contatar o Service Desk através dos canais abaixo para atualização do chamado e abertura de novos chamados.
+
+TELEFONE
+Ramal 2200 / (31) 3237-2200 / 0800 275 9303
+CHATBOT
++55 31 3181-0607
+ASSYST
+https://suporteti.lanlink.com.br/assystnet/
+E-MAIL
+suporteti.ipsemg@lanlink.com.br`;
+
+  const textarea = document.getElementById('scriptCentral');
+  textarea.value = script;
+  copiarTexto('scriptCentral');
+}
   
 </script>
 </body>
