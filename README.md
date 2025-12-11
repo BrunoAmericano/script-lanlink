@@ -83,4 +83,4 @@ Simples. Rápido. Sem drama.
 ![imagem](https://github.com/BrunoAmericano/script-lanlink/blob/main/Screenshot_6.png?raw=true)
 
 ## Depois
-![imagem](https://github.com/BrunoAmericano/script-lanlink/blob/main/Screenshot_5.png?raw=true)
+![imagem](https://github.com/BrunoAmericano/script-lanlink/blob/main/Screenshot_7.png?raw=true)
