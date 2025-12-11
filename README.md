@@ -79,3 +79,8 @@ Simples. Rápido. Sem drama.
 - Consistência entre todos os scripts  
 
 ---
+## Antes
+![imagem](https://github.com/BrunoAmericano/script-lanlink/blob/main/Screenshot_6.png?raw=true)
+
+## Depois
+![imagem](https://github.com/BrunoAmericano/script-lanlink/blob/main/Screenshot_5.png?raw=true)
